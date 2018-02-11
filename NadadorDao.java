@@ -80,7 +80,7 @@ public class NadadorDao {
 		}
 		return nadadors;
 	}
-	
+
 	Nadador getNadador(String nom) {
 		Connection conn = null;
 		try {
@@ -100,18 +100,21 @@ public class NadadorDao {
 		ResultSet rs = null;
 		Nadador nadador = null;
 		try {
+			stmt = conn.prepareStatement("SELECT * FROM Nadador WHERE nom = ?");
+			stmt.setString(1, nom);
 			rs = stmt.executeQuery();
- 				 
-				  
-				for (Nadador n : getNadadors()) {
-					if (n.nom.equals(nom)) {
-						stmt = conn.prepareStatement("select nom from Nadador where nom like="+nom+"");	
-					}
-				}
-				 
-				
-				stmt.executeQuery();
-			  
+			
+			if (rs!=null) {
+				while (rs.next()) {
+					nadador = new Nadador();
+					nadador.setNom(rs.getString("nom"));
+					nadador.setEdat(rs.getInt("edat"));
+					nadador.setNumFederat(rs.getString("num_federat"));
+					nadador.setSexe(rs.getString("sexe"));					 
+				} 
+			}	
+			stmt.executeQuery();
+
 		}catch (SQLException e) {
 			Log.severe("Error executant PreparedStatement");
 			e.printStackTrace();
@@ -144,7 +147,7 @@ public class NadadorDao {
 		}
 		return nadador;
 	}
-	
+
 	void addNadador(Nadador nadador) {
 		Connection conn = null;
 		try {
@@ -162,9 +165,9 @@ public class NadadorDao {
 		}
 		PreparedStatement stmt = null;
 		try {
-			 stmt = conn.prepareStatement(
+			stmt = conn.prepareStatement(
 					"insert into Nadador(nom, num_federat, edat, sexe) "
-					+ "values(?, ?, ?, ?)");
+							+ "values(?, ?, ?, ?)");
 			stmt.setString(1, nadador.getNom());
 			stmt.setString(2, nadador.getNumFederat());
 			stmt.setInt(3, nadador.getEdat());
@@ -212,10 +215,10 @@ public class NadadorDao {
 		try {
 			stmt = conn.prepareStatement(
 					"update Nadador "
-					+ "set num_federat = ?,"
-					+ "edat = ?,"
-					+ "sexe = ?"
-					+ "where nom = ?");
+							+ "set num_federat = ?,"
+							+ "edat = ?,"
+							+ "sexe = ?"
+							+ "where nom = ?");
 			stmt.setString(1, nadador.getNumFederat());
 			stmt.setInt(2, nadador.getEdat());
 			stmt.setString(3, nadador.getSexe());
@@ -262,7 +265,9 @@ public class NadadorDao {
 		PreparedStatement stmt = null;
 		try {
 			// Codi que esborra  el nadador de la base de dades	
-			// A completar
+			stmt = conn.prepareStatement("DELETE FROM Nadador WHERE nom = ?");
+			stmt.setString(1, nadador.getNom());
+			stmt.executeUpdate();
 		}
 		catch (SQLException e) {
 			Log.severe("Error executant PreparedStatement");
